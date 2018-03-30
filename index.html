@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>QR Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="css/font-awesome.css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css" />
+  <style>
+    
+  </style>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <div id="overlay">
+  </div>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#" style="font-size: 36px;">
+        <i class="fa fa-qrcode" aria-hidden="true"></i>
+        <label style="margin-left:5px;">QR.support</label>
+      </a>
+    </nav>
+  </div>
+  <div class="container">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="scan-tab" data-toggle="tab" href="#scan" role="tab" aria-controls="scan" aria-selected="true">Scan</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="upload-tab" data-toggle="tab" href="#upload" role="tab" aria-controls="upload" aria-selected="false">Upload</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="generate-tab" data-toggle="tab" href="#generate" role="tab" aria-controls="generate" aria-selected="false">Generate</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="scan" role="tabpanel" aria-labelledby="scan-tab">
+        <!-- Insta scan for qr Code -->
+        <!-- <audio id="audio" autoplay controls>
+          <source src="audio_file.mp3" type="audio/mpeg">
+           You browser doesn't support the HTML5 audio tag!
+        </audio> -->
+        <!-- Audio for alert when scan gets qr code -->
+        <audio id="denied" autobuffer preload="auto">
+          <source src="audio_file.mp3" />
+        </audio>
+        <h1>Scan QR code</h1>
+        <br />
+        <!-- Start or Stop for scaning Process -->
+        <button class="btn btn-success" id="startScanning">Start</button>
+        <button id="stopScanning" class="btn btn-danger" style="display:none">Stop</button>
+        <br />
+        <!-- <section id="app" style="width:640px;height:480px; margin:0 auto;display:none">
+          <select id="webcameraChanger" onchange="cameraChange($(this).val());"></select>
+          <!-- webcamera view component ->
+          <video id="webcameraPreview" playsinline autoplay controls muted loop style="width: 100%;"></video>
+        </section> -->
+        <!-- Scan camera list and Scan Results -->
+        <div id="app" style="display:none">
+          <div class="container">
+            <div class="preview-container">
+              <video id="previewVideo"></video>
+            </div>
+          </div>
+          <div class="container-fluid cameramenu hidecamera">
+            <h2>Cameras</h2>
+            <!-- Camera List Start -->
+            <ul class="list-group cameras">
+              <li v-if="cameras.length === 0" class="empty list-group-item">No cameras found</li>
+              <li v-for="camera in cameras" class="list-group-item">
+                <span v-if="camera.id == activeCameraId" :title="formatName(camera.name)" class="active">{{ formatName(camera.name) }}</span>
+                <span v-if="camera.id != activeCameraId" :title="formatName(camera.name)">
+                  <a @click.stop="selectCamera(camera)">{{ formatName(camera.name) }}</a>
+                </span>
+              </li>
+            </ul>
+            <!-- Camera List End -->
+          </div>
+          <div class="container cameramenu scans">
+            <!-- Scan list Start -->
+            <h2>Scans</h2>
+            <ul v-if="scans.length === 0" class="list-group">
+              <li class="list-group-item empty">No scans yet</li>
+            </ul>
+            <transition-group name="scans" tag="ul" class="list-group checkscaned">
+              <li class="list-group-item" v-for="scan in scans" :key="scan.date" :title="scan.content">{{ scan }}</li>
+            </transition-group>
+            <!-- Scan List End -->
+          </div>
+          <!-- Append Form here if form is available in qr  -->
+          <div id="forScan"></div>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+        <!-- Read Qr Code -->
+        <h1>Check QR Code url</h1>
+        <br />
+        <div class="form-group">
+          <label for="uploadQRcode">
+            <h2>Upload file</h2>
+          </label>
+          <input type="file" class="form-control-file" id="uploadQRcode">
+        </div>
+        <!-- <input type="file" id="uploadQRcode"> -->
+        <!-- <button class="btn btn-primary" id="createqr">Check QR</button> -->
+        <!-- Result Uploaded Qr Code -->
+        <h2>Result</h2>
+        <div id="preview" style="width:100%;height:10px; margin-top:15px;"></div>
+      </div>
+      <div class="tab-pane fade" id="generate" role="tabpanel" aria-labelledby="generate-tab">
+        <!-- Create Qr Code -->
+        <h1>Create QR Code</h1>
+        <br />
+        <br />
+        <!-- Tabes for Different Options for Create qr -->
+        <ul class="nav flex-column" >
+          <!-- <li class="nav-item">
+            <div class="form-check ">
+              <input class="form-check-input generateOption" type="radio" name="generateOption" id="goToLink" value="link" checked>
+              <label class="form-check-label" for="goToLink">
+                 Go to Link
+              </label>
+            </div>
+          </li> -->
+          <li class="nav-item">
+            <div class="form-check ">
+              <input class="form-check-input generateOption" type="radio" name="generateOption" id="makeRequestSelection" value="makeRequest" checked>
+              <label class="form-check-label" for="makeRequestSelection">
+                 Make Request
+              </label>
+            </div>
+            
+          </li>
+          <li class="nav-item">
+            <div class="form-check ">
+              <input class="form-check-input generateOption" type="radio" name="generateOption" id="generateBulkQR" value="bulkQr" checked>
+              <label class="form-check-label" for="generateBulkQR">
+                 Go to Link
+              </label>
+            </div>
+            
+          </li>
+        </ul>
+        <div class="tab-content" id="myTab2Content">
+          <!-- <div class="tab-pane fade show active checkGenerateSelection" id="link" role="tabpanel" aria-labelledby="link-tab">
+            <!-- Create qr Code using Url >
+            <br />
+            <br />
+            <br />
+            <div class="form-group  mb-2">
+              <label for="inputPassword2" class="sr-only">Enter Url</label>
+              <input class="form-control form-control-lg " id="text" value="https://www.facebook.com" type="text" >
+            </div>
+            <!-- <div class="form-group  mb-2">
+              <button onclick="createQR();" class="btn btn-primary  mb-2">Generate</button>
+            </div> ->
+            <div id="qrcode" style=" margin:15px 0;"></div>
+            <a id="qrcodeimages" class="btn btn-primary mb-2" download="qrcode.png" href="">
+              Download
+            </a>
+          </div> -->
+          <div class="tab-pane fade checkGenerateSelection show active" id="makeRequest" role="tabpanel" aria-labelledby="makeRequest-tab">
+            <!-- Make Request for generate qr Code -->
+            <br />
+            
+            <!-- <div class="form-group  mb-2">
+              <label for="inputPassword2" class="sr-only">Action</label>
+              <input class="form-control form-control-lg" id="action" value="" placeholder="Enter Your Action Url" type="text">
+            </div> -->
+
+            <div class="form-group">
+              <label for="getmethod">Method</label>
+              <select class="form-control" name="getmethod" id="getmethod">
+                <option value="get">Get</option>
+                <option value="post">Post</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="enterdetail">Enter one URL per line</label>
+              <textarea class="form-control" id="enterdetail" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+               <button id="createrequestQr" style="display:none" class="btn btn-primary mb-2">Generate</button>
+              <button id="downloadZipRequestQr" class="btn btn-primary mb-2">Download Zip</button>
+              
+            </div>
+
+          </div>
+          <div class="tab-pane fade checkGenerateSelection " id="bulkQr" role="tabpanel" aria-labelledby="bulkQr-tab">
+            <!- Create Bulk Qr Code using bulk url ->
+            <br />
+            <div class="form-group">
+              <label for="exampleFormControlTextarea1">Enter one URL per line for Generate QR Code in Bulk</label>
+              <textarea class="form-control" id="bulkUrl" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <button id="generateBulkQr" class="btn btn-primary mb-2">Generate</button>
+              <button id="downloadZipBulkQr" class="btn btn-primary mb-2">Download Zip</button>
+            </div>
+            <div id="getBulkQr" style="display:none"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- <a href="createqr.html" title="Create qr Code from url">
+      <button> Create QR</button>
+    </a> -->
+
+  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/VanillaQR.js"></script>
+  <script type="text/javascript" src="js/adapter.min.js"></script>
+  <script type="text/javascript" src="js/instascan.js"></script>
+  <script type="text/javascript" src="js/QrCodeScanner.js"></script>
+  <script type="text/javascript" src="js/vue.min.js"></script>
+  <!-- <script type="text/javascript" src="js/instascan.min.js"></script> -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script type="text/javascript" src="js/popper.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <!-- <script type="text/javascript" src="../app.js"></script> -->
+  <script type="text/javascript" src="js/custom/generate.js"></script>
+  <script type="text/javascript" src="js/custom/readqr.js"></script>
+  <script type="text/javascript" src="js/custom/scanqr.js"></script>
+  <script type="text/javascript" src="js/jszip.js"></script>
+ <script src="https://stuk.github.io/jszip/vendor/FileSaver.js"></script>
+  <script>
+    // ON Enter height increase of textarea
+    $("textarea").keyup(function (e) {
+        while ($(this).outerHeight() < this.scrollHeight + parseFloat($(this).css("borderTopWidth")) + parseFloat($(this).css("borderBottomWidth"))) {
+          $(this).height($(this).height() + 1);
+        };
+      });
+      $('#downloadZipBulkQr').click(function () {
+          var bulkUrl = $('#bulkUrl').val()
+        //make div empty
+        document.getElementById("getBulkQr").innerHTML = "";
+        //create array from value of textarea
+        var bulkUrlarray = bulkUrl.split("\n");
+        // Initiate Zip
+        var zip = new JSZip();
+        //add QR urls in text files
+        zip.file("qr code.txt", bulkUrlarray);
+        // Make Folder for store images of QR
+        var img1 = zip.folder("images");
+        // Get Single Url FOr Generate QR Code
+        for (var key in bulkUrlarray) {
+          if (bulkUrlarray[key] != null || bulkUrlarray[key] != '') {
+            // Get Image Base64
+            var img = createBulkQR(bulkUrlarray[key]);
+            //Create image and pack it in zip
+            img1.file(key + "qr.png", img, { base64: true });
+          }
+        }
+        $("#getBulkQr").show();
+        // Make complete zip and save it as example.zip
+        zip.generateAsync({ type: "base64", mimeType: "application/octet-stream" })
+          .then(function (content) {
+            // see FileSaver.js
+            window.location = "data:application/zip;base64," + content;
+            // saveAs(content, "getRequest.zip");
+          });
+        });
+      //On click Generate qr code zip
+
+      $('#generateBulkQr').click(function(){
+        // Get Value of textarea
+         var bulkUrl = $('#bulkUrl').val()
+        //make div empty
+        document.getElementById("getBulkQr").innerHTML = "";
+        //create array from value of textarea
+        var bulkUrlarray = bulkUrl.split("\n");
+        // Initiate Zip
+        // Make Folder for store images of QR
+        
+        // Get Single Url FOr Generate QR Code
+        for (var key in bulkUrlarray) {
+          if (bulkUrlarray[key] != null || bulkUrlarray[key] != '') {
+            // Get Image Base64
+           createBulkQR(bulkUrlarray[key]);
+            //Create image and pack it in zip
+           
+          }
+        }
+        $("#getBulkQr").show();
+        // Make complete zip and save it as example.zip
+        
+      });
+
+      $('#downloadZipRequestQr').click(function(){
+        $("#createrequestQr").trigger("click");
+      });
+
+      $('#createrequestQr').click(function () {
+          // Get Value of textarea
+           $("#getBulkQr").hide();
+          var bulkUrl = $('#enterdetail').val()
+          var method = $('#getmethod').val();
+          //make div empty
+          document.getElementById("getBulkQr").innerHTML = "";
+          //create array from value of textarea
+          var bulkUrlarray = bulkUrl.split("\n");
+          // Initiate Zip
+          var zip = new JSZip();
+          //add QR urls in text files
+          zip.file("qr code.txt", "Method : "+ method+ '\n urls : ' + $('#enterdetail').val());
+          // Make Folder for store images of QR
+          var img1 = zip.folder("images");
+          // Get Single Url FOr Generate QR Code
+          for (var key in bulkUrlarray) {
+            if (bulkUrlarray[key] != null || bulkUrlarray[key] != '') {
+              // Get Image Base64
+              var img = createBulkQR('{ "action" :"' +bulkUrlarray[key] +'" , "method" :"'+ method +'"}');
+              //Create image and pack it in zip
+              img1.file(key + "qr.png", img, { base64: true });
+            }
+          }
+          // Make complete zip and save it as example.zip
+          zip.generateAsync({ type: "base64", mimeType: "application/octet-stream"})
+            .then(function (content) {
+              // see FileSaver.js
+               window.location = "data:application/zip;base64," + content;
+             // saveAs(content, "getRequest.zip");
+            });
+        });
+      
+  </script>
+</body>
+
+</html>
