@@ -31,7 +31,8 @@ startVideoScanning.onclick = function () {
             self.scanner = new Instascan.Scanner({ video: document.getElementById('previewVideo'), scanPeriod: 5 });
             //add listener for get scan
             self.scanner.addListener('scan', function (content, image) {
-                console.log(Date.now())
+                $('.checkScan').show();
+                //console.log(Date.now())
                 // Add flash on body with element 
                 //document.getElementById("overlay").style.display = "block";
                 //set timeout for removing flash using element
@@ -87,7 +88,7 @@ startVideoScanning.onclick = function () {
                         }
                         //append form to element or div
                         document.getElementById('forScan').appendChild(form);
-                        self.scans.unshift({ date: +(Date.now()), content: response });
+                        //self.scans.unshift({ date: +(Date.now()), content: response[key] });
                         // For Submitting Form
                         formsubmit();
                     } else {
@@ -111,9 +112,10 @@ startVideoScanning.onclick = function () {
                 }
                 // check url validate
                 else if (checkUrl) {
+                    //var response = JSON.parse(content);
                     self.scans.unshift({ date: +(Date.now()), content: content });
                 } else {
-                    self.scans.unshift({ date: +(Date.now()), content: content });
+                    self.scans.unshift({  content: content });
                 }
             });
             //check camera available or not 
@@ -127,7 +129,7 @@ startVideoScanning.onclick = function () {
                     console.error('No cameras found.');
                 }
             }).catch(function (e) {
-                console.error(e);
+                console.error(e);                   
             });
 
         },
@@ -149,6 +151,7 @@ startVideoScanning.onclick = function () {
 }
 // Onclick stop 
 document.getElementById('stopScanning').onclick = function () {
+    $('.checkScan').hide();
     app.scanner.stop();
     document.getElementById('stopScanning').style.display = 'none';
     document.getElementById('app').style.display = 'none';
@@ -162,4 +165,22 @@ function formsubmit() {
     if (typeof elemFound !== 'undefined' && elemFound !== null) {
         elemFound.submit();
     }
+}
+
+function copyToClipboard(element) {
+    var $temp = $("<input>");
+    $("body").append($temp);
+    var i = 0;
+    var getValue = '';
+    $(element).each(function () {
+        if (i > 0) {
+            getValue = getValue + ',';
+        }
+        getValue = getValue + $(this).html();
+        i++;
+    });
+    $temp.val(getValue).select();
+    document.execCommand("copy");
+    $temp.remove();
+    alert('Copy To Clipboard')
 }

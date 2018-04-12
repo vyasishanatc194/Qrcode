@@ -73,7 +73,7 @@
               <li v-if="cameras.length === 0" class="empty list-group-item">No cameras found</li>
               <li v-for="camera in cameras" class="list-group-item">
                 <span v-if="camera.id == activeCameraId" :title="formatName(camera.name)" class="active">{{ formatName(camera.name) }}</span>
-                <span v-if="camera.id != activeCameraId" :title="formatName(camera.name)">
+                <span v-if="camera.id != activeCameraId" :title="formatName(camera.name)" >
                   <a @click.stop="selectCamera(camera)">{{ formatName(camera.name) }}</a>
                 </span>
               </li>
@@ -86,10 +86,21 @@
             <ul v-if="scans.length === 0" class="list-group">
               <li class="list-group-item empty">No scans yet</li>
             </ul>
+            <br/>
+            <button class="btn btn-success checkScan" style="display: none;" onclick="copyToClipboard('.getText')">Copy To Clipboard</button>
+            <br/>
             <transition-group name="scans" tag="ul" class="list-group checkscaned">
-              <li class="list-group-item" v-for="scan in scans" :key="scan.date" :title="scan.content">{{ scan }}</li>
+              
+              <!-- <li class="list-group-item" v-for="scan in scans" :key="scan.date" :title="scan.content">{{ scan }}</li> -->
+              <li class="list-group-item getText" v-for="scan in scans":key="scan.date" :title="scan.content" >{{ scan.content }}</li>
             </transition-group>
             <!-- Scan List End -->
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            
           </div>
           <!-- Append Form here if form is available in qr  -->
           <div id="forScan"></div>
@@ -219,13 +230,13 @@
   <script type="text/javascript" src="js/index.js"></script>
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/VanillaQR.js"></script>
-  <script type="text/javascript" src="js/adapter.min.js"></script>
+  <!-- <script type="text/javascript" src="js/adapter.min.js"></script> -->
   <script type="text/javascript" src="js/instascan.js"></script>
   <script type="text/javascript" src="js/QrCodeScanner.js"></script>
   <script type="text/javascript" src="js/vue.min.js"></script>
   <!-- <script type="text/javascript" src="js/instascan.min.js"></script> -->
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <script type="text/javascript" src="js/popper.min.js"></script>
+  <!-- <script type="text/javascript" src="js/popper.min.js"></script> -->
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <!-- <script type="text/javascript" src="../app.js"></script> -->
   <script type="text/javascript" src="js/custom/generate.js"></script>
@@ -335,5 +346,6 @@
       
   </script>
 </body>
-
+<!-- <script type="text/javascript" src="//www.yorgsite.fr/experiments/YConsole/YConsole-compiled.js"></script>
+<script type="text/javascript">YConsole.show();</script> -->
 </html>
